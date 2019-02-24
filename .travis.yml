@@ -44,4 +44,3 @@ script:
   - git submodule update --init --recursive
   - make dep
   - make
-  - make install
