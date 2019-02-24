@@ -14,6 +14,7 @@
 #include "patch.hpp"
 #include "ui.hpp"
 #include "system.hpp"
+#include "string.hpp"
 
 #include <osdialog.h>
 #include <thread>
@@ -122,7 +123,7 @@ int main(int argc, char *argv[]) {
 	// Initialize app
 	INFO("Initializing app");
 	settings.load(asset::user("settings.json"));
-	app::init(headless);
+	appInit(headless);
 	if (!headless) {
 		APP->scene->devMode = devMode;
 		APP->patch->init(patchPath);
@@ -144,9 +145,11 @@ int main(int argc, char *argv[]) {
 	APP->engine->stop();
 
 	// Destroy app
-	// APP->patch->save(asset::user("autosave.vcv"));
+	if (!headless) {
+		APP->patch->save(asset::user("autosave.vcv"));
+	}
 	INFO("Destroying app");
-	app::destroy();
+	appDestroy();
 	settings.save(asset::user("settings.json"));
 
 	// Destroy environment

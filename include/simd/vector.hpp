@@ -1,26 +1,26 @@
-#include "sse_mathfun.h"
+#pragma once
 #include <cstring>
 #include <emmintrin.h>
 
 
 namespace rack {
-namespace dsp {
+namespace simd {
 
 
-/** Casts an int to float, bitwise without conversion. */
-inline float cast_i32_f32(int i) {
-	static_assert(sizeof(int) == sizeof(float), "int and float must be the same size");
+/** Casts the literal bits of FROM to TO without type conversion.
+API copied from C++20.
+
+Usage example:
+
+	printf("%08x\n", bit_cast<int>(1.f)); // Prints 3f800000
+*/
+template <typename TO, typename FROM>
+TO bit_cast(const FROM &x) {
+	static_assert(sizeof(FROM) == sizeof(TO), "types must have equal size");
 	// Should be optimized to two `mov` instructions
-	float f;
-	std::memcpy(&f, &i, sizeof(f));
-	return f;
-}
-
-
-inline int cast_f32_i32(float f) {
-	float i;
-	std::memcpy(&i, &f, sizeof(i));
-	return i;
+	TO y;
+	std::memcpy(&y, &x, sizeof(x));
+	return y;
 }
 
 
@@ -29,6 +29,7 @@ inline int cast_f32_i32(float f) {
 This class is designed to be used just like `float` scalars, with extra features for handling bitwise logic, conditions, loading, and storing.
 
 Usage example:
+
 	float a[4], b[4];
 	f32_4 a = f32_4::load(in);
 	f32_4 b = 2.f * a / (1 - a);
@@ -88,14 +89,6 @@ typedef f32<4> f32_4;
 #define DECLARE_F32_4_OPERATOR_INFIX(operator, func) \
 	inline f32_4 operator(const f32_4 &a, const f32_4 &b) { \
 		return f32_4(func(a.v, b.v)); \
-	} \
-	template <typename T> \
-	f32_4 operator(const T &a, const f32_4 &b) { \
-		return operator(f32_4(a), b); \
-	} \
-	template <typename T> \
-	f32_4 operator(const f32_4 &a, const T &b) { \
-		return operator(a, f32_4(b)); \
 	}
 
 /** `a @= b` */
@@ -103,10 +96,6 @@ typedef f32<4> f32_4;
 	inline f32_4 &operator(f32_4 &a, const f32_4 &b) { \
 		a = opfunc(a, b); \
 		return a; \
-	} \
-	template <typename T> \
-	f32_4 &operator(f32_4 &a, const T &b) { \
-		return operator(a, f32_4(b)); \
 	}
 
 DECLARE_F32_4_OPERATOR_INFIX(operator+, _mm_add_ps)
@@ -116,9 +105,11 @@ DECLARE_F32_4_OPERATOR_INFIX(operator/, _mm_div_ps)
 
 /**
 Use these to apply logic, bit masks, and conditions to elements.
+
 Examples:
 
 Subtract 1 from value if greater than or equal to 1.
+
 	x -= (x >= 1.f) & 1.f;
 */
 DECLARE_F32_4_OPERATOR_INFIX(operator^, _mm_xor_ps)
@@ -184,75 +175,5 @@ DECLARE_F32_4_OPERATOR_INFIX(operator<, _mm_cmplt_ps)
 DECLARE_F32_4_OPERATOR_INFIX(operator!=, _mm_cmpneq_ps)
 
 
-// Math functions
-
-
-inline f32_4 fmax(f32_4 x, f32_4 b) {
-	return f32_4(_mm_max_ps(x.v, b.v));
-}
-
-inline f32_4 fmin(f32_4 x, f32_4 b) {
-	return f32_4(_mm_min_ps(x.v, b.v));
-}
-
-inline f32_4 sqrt(f32_4 x) {
-	return f32_4(_mm_sqrt_ps(x.v));
-}
-
-/** Returns the approximate reciprocal square root.
-Much faster than `1/sqrt(x)`.
-*/
-inline f32_4 rsqrt(f32_4 x) {
-	return f32_4(_mm_rsqrt_ps(x.v));
-}
-
-/** Returns the approximate reciprocal.
-Much faster than `1/x`.
-*/
-inline f32_4 rcp(f32_4 x) {
-	return f32_4(_mm_rcp_ps(x.v));
-}
-
-inline f32_4 log(f32_4 x) {
-	return f32_4(sse_mathfun_log_ps(x.v));
-}
-
-inline f32_4 exp(f32_4 x) {
-	return f32_4(sse_mathfun_exp_ps(x.v));
-}
-
-inline f32_4 sin(f32_4 x) {
-	return f32_4(sse_mathfun_sin_ps(x.v));
-}
-
-inline f32_4 cos(f32_4 x) {
-	return f32_4(sse_mathfun_cos_ps(x.v));
-}
-
-inline f32_4 floor(f32_4 a) {
-	return f32_4(sse_mathfun_floor_ps(a.v));
-}
-
-inline f32_4 ceil(f32_4 a) {
-	return f32_4(sse_mathfun_ceil_ps(a.v));
-}
-
-inline f32_4 round(f32_4 a) {
-	return f32_4(sse_mathfun_round_ps(a.v));
-}
-
-inline f32_4 fmod(f32_4 a, f32_4 b) {
-	return f32_4(sse_mathfun_fmod_ps(a.v, b.v));
-}
-
-inline f32_4 fabs(f32_4 a) {
-	return f32_4(sse_mathfun_fabs_ps(a.v));
-}
-
-inline f32_4 trunc(f32_4 a) {
-	return f32_4(sse_mathfun_trunc_ps(a.v));
-}
-
-
-} // namespace dsp
+} // namespace simd
 } // namespace rack

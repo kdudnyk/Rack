@@ -10,7 +10,7 @@ namespace engine {
 static const int PORT_MAX_CHANNELS = 16;
 
 
-struct Port {
+struct alignas(32) Port {
 	/** Voltage of the port. */
 	union {
 		/** Unstable API. Use getVoltage() and setVoltage() instead. */
@@ -43,7 +43,7 @@ struct Port {
 
 	/** Returns the given channel's voltage if the port is polyphonic, otherwise returns the first voltage (channel 0). */
 	float getPolyVoltage(int channel) {
-		return (channels == 1) ? getVoltage(channel) : getVoltage(0);
+		return (channels == 1) ? getVoltage(0) : getVoltage(channel);
 	}
 
 	/** Returns the voltage if a cable is connected, otherwise returns the given normal voltage. */
@@ -53,6 +53,20 @@ struct Port {
 
 	float getNormalPolyVoltage(float normalVoltage, int channel) {
 		return isConnected() ? getPolyVoltage(channel) : normalVoltage;
+	}
+
+	/** Reads all voltage values from an array of size `channels` */
+	void setVoltages(const float *voltages) {
+		for (int c = 0; c < channels; c++) {
+			this->voltages[c] = voltages[c];
+		}
+	}
+
+	/** Writes all voltage values to an array of size `channels` */
+	void getVoltages(float *voltages) {
+		for (int c = 0; c < channels; c++) {
+			voltages[c] = this->voltages[c];
+		}
 	}
 
 	/** Sets the number of polyphony channels. */

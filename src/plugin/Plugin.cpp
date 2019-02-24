@@ -74,12 +74,17 @@ void Plugin::fromJson(json_t *rootJ) {
 
 	json_t *modulesJ = json_object_get(rootJ, "modules");
 	if (modulesJ) {
-		const char *slug;
+		size_t moduleId;
 		json_t *moduleJ;
-		json_object_foreach(modulesJ, slug, moduleJ) {
-			Model *model = getModel(slug);
+		json_array_foreach(modulesJ, moduleId, moduleJ) {
+			json_t *modelSlugJ = json_object_get(moduleJ, "slug");
+			if (!modelSlugJ)
+				continue;
+			std::string modelSlug = json_string_value(modelSlugJ);
+
+			Model *model = getModel(modelSlug);
 			if (!model) {
-				WARN("plugin.json contains module \"%s\" but it is not defined in the plugin", slug);
+				WARN("plugin.json of \"%s\" contains module \"%s\" but it is not defined in the plugin", slug.c_str(), modelSlug.c_str());
 				continue;
 			}
 
