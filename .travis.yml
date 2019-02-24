@@ -42,6 +42,6 @@ script:
   - ls -lisa
   - pwd
   - git submodule update --init --recursive
-  - make dep -j
-  - make -j
-  - make run
+  - make dep
+  - make
+  - make install
