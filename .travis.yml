@@ -15,7 +15,7 @@ matrix:
           packages:
             - g++
             - gcc
-            - build-essentials
+            - build-essential
             - git
             - curl
             - cmake
@@ -35,8 +35,10 @@ before_install:
     - eval "${MATRIX_EVAL}"
 
 script:
+  - lsb_release -a
   - cmake --version
   - gcc --version
   - g++ --version
   - ls -lisa
   - pwd
+
