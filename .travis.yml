@@ -1,4 +1,3 @@
-dist: xenial
 sudo: required
 language:
   - cpp
@@ -6,6 +5,7 @@ matrix:
   include:
     # works on Precise and Trusty
     - os: linux
+      dist: xenial
       addons:
         apt:
           packages:
@@ -22,6 +22,8 @@ matrix:
             - libjack-jackd2-dev
             - python3-pip
             - python3-setuptools
+    - os: osx
+    - os: windows
 
 before_script:
   - |
@@ -32,5 +34,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 script:
+  - python --version
+  - conan --version
   - make dep
   - make
