@@ -11,5 +11,6 @@ pool:
 
 steps:
 - script: |
+    make dep
     make
   displayName: 'make'
