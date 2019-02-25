@@ -29,7 +29,7 @@ before_script:
   - |
     if [[ "$TRAVIS_OS_NAME" == "windows" ]]
       then
-        choco install -y python3
+        choco install -y python3 msys2
         pacman -Syu
         pacman -Su git wget make tar unzip zip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake autoconf automake mingw-w64-x86_64-libtool mingw-w64-x86_64-jq
     fi
