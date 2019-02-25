@@ -20,17 +20,17 @@ matrix:
             - libasound2-dev
             - libgtk2.0-dev
             - libjack-jackd2-dev
+            - python3
+            - python3-pip
+
+before_script:
+  - |
+    pip3 install --upgrade pip
+    pip3 install conan
 
 before_install:
-    - eval "${MATRIX_EVAL}"
+  - eval "${MATRIX_EVAL}"
 
 script:
-  - lsb_release -a
-  - cmake --version
-  - gcc --version
-  - g++ --version
-  - ls -lisa
-  - pwd
-  - git submodule update --init --recursive
   - make dep
   - make
