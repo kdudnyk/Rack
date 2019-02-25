@@ -11,8 +11,8 @@ pool:
 
 steps:
 - script: |
-    sudo apt update -y && sudo apt upgrade -y
-    sudo apt-get install -y \
+    sudo apt update -y && sudo apt upgrade -y -o Dpkg::Options::="--force-confold"
+    sudo apt install -y \
     curl libcurl4-openssl-dev libx11-dev libglu1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev \
     libxi-dev zlib1g-dev libasound2-dev libgtk2.0-dev libjack-jackd2-dev jq
     pip3 install --user --upgrade pip
