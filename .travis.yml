@@ -2,10 +2,6 @@ dist: xenial
 sudo: required
 language:
   - cpp
-compiler:
-  - gcc
-  - g++
-
 matrix:
   include:
     # works on Precise and Trusty
@@ -13,12 +9,7 @@ matrix:
       addons:
         apt:
           packages:
-            - g++
-            - gcc
-            - build-essential
-            - git
             - curl
-            - cmake
             - libx11-dev
             - libglu1-mesa-dev
             - libxrandr-dev
@@ -29,7 +20,6 @@ matrix:
             - libasound2-dev
             - libgtk2.0-dev
             - libjack-jackd2-dev
-            - jq
 
 before_install:
     - eval "${MATRIX_EVAL}"
